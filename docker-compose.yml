@@ -1,0 +1,11 @@
+version: "3"
+services: 
+  pandas-server:
+    build: ~/Pandas-server
+    container_name: pandas-server
+    restart : always
+    volumes:
+      - ~/Pandas-server:/opt
+    environment: 
+      TZ: "Aisa/Seoul"
+    command: python3 -u /opt/run.py
