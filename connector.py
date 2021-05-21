@@ -80,11 +80,3 @@ class Kafka :
     
     def close_stream(self) :
         self.stream = False
-
-class ELK(Elasticsearch) :
-    def __init__(self,keyfile,index) :
-        pass
-    def load_key(self,key_file) :
-        with open(key_file) as key_file :
-            key = json.load(key_file)
-        return key
