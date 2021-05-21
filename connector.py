@@ -32,8 +32,13 @@ class MySQL :
         sql_query = f'SELECT * FROM {table}'
         db.execute(sql_query)
         return pd.DataFrame(db.fetchall()).drop(['id'],axis='columns')
+    
+    def update_data(self,table,items) :
+        db = self.conn_mysqldb()
+        cursor = db.cursor()
 
-class Kafka(KafkaConsumer) :
+
+class Kafka :
     def __init__(self,keyfile,topic) :
         KEY = self.load_key(key_file)
         self.stream = True
