@@ -6,6 +6,12 @@ class MainServer(MySQL) :
     def __init__(self) :
         super().__init__(key_file='keys/aws_sql_key.json',database='crawl_job')
 
-    def get_recruit_title(self) :
-        pass
+    @property
+    def get_recruit_data(self) :
+        return self.get_dataframe('job_detail')
+
+    @property
+    def get_jobplanet_data(self) :
+        return self.get_dataframe('company_info')
+
     
