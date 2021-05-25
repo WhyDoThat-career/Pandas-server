@@ -1,34 +1,40 @@
 #To Do
 #Docker에서 실행할 run.py
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI,Request
+from pydantic import BaseModel
 from Data_server.kafka_server import KafkaThread
-from connector import Kafka
+from connector import Kafka, Redis
 import logging
 import time
-
+import random
 
 app = FastAPI()
-kafka = KafkaThread()
-user_session = dict()
+kafka = {'user':None,'activity':{}}
+user_session = Redis()
 
 def recommand(user) :
-    return ['32','52']
+    return [random.randint(1,5000),random.randint(1,5000)]
 
-@app.get("/")
-def read_root():
-    if 'info' in kafka.activity['activity'] :
-        if kafka.activity['activity']['info'] == 'Login' :
-            user_id = kafka.activity['user']
-            user_session[user_id] = recommand(user_id)
-        elif kafka.activity['activity']['info'] == 'Logout' :
-            user_id = kafka.activity['user']
+@app.post('/kafka')
+async def consumer(request: Request) :
+    global kafka, user_session
+    kafka = await request.json()
+    if 'info' in kafka['activity'] :
+        if kafka['activity']['info'] == 'Login' :
+            user_id = kafka['user']
+            user_session.insert(user_id,recommand(user_id))
+        elif kafka['activity']['info'] == 'Logout' :
+            user_id = kafka['user']
             try :
-                del user_session[user_id]
-            except KeyError :
+                user_session.delete(user_id)
+            except :
+                print('Already delete data')
                 pass
-    return kafka.activity,user_session
+    return True
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
+@app.get("/recommand")
+def read_reco():
+    global kafka, user_session
+    print('read_reco :',kafka)
+    return kafka,user_session.get_all()

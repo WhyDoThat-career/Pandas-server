@@ -4,8 +4,35 @@ services:
     build: ~/Pandas-server
     container_name: pandas-server
     restart : always
+    ports :
+      - "8080:8080"
     volumes:
       - ~/Pandas-server:/opt
     environment: 
       TZ: "Aisa/Seoul"
-    command: python3 -u /opt/run.py
+    # command : python3 -u run.py
+    # command: gunicorn -w 1 -b 0.0.0.0:8080 --reload run:app
+    command: uvicorn run:app --reload --host=0.0.0.0 --port=8080
+
+  redis :
+    image : redis
+    container_name: redis-server
+    restart: always
+    command: redis-server --port 6379
+    volumes:
+      - ~/Pandas-server:/opt
+    labels :
+      - "name=redis"
+      - "mode=standalone"
+    ports :
+      - "6379:6379"
+  
+  kafka-consumer :
+    build : ~/Pandas-server/kafka-consumer
+    container_name: kafka-consumer
+    restart : always
+    volumes:
+      - ~/Pandas-server:/opt
+    environment: 
+      TZ: "Aisa/Seoul"
+    command: python3 -u /opt/kafka-consumer/run.py

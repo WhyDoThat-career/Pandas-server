@@ -2,7 +2,6 @@
 #Kafka consumer를 통해 kafka stream을 가져옵니다.
 from connector import Kafka
 import threading
-import uvicorn
 
 class KafkaThread(Kafka) :
     def __init__(self) :

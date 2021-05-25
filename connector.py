@@ -1,9 +1,9 @@
 import pymysql
 from pymysql.cursors import DictCursor
 from kafka import KafkaConsumer
-from elasticsearch import Elasticsearch
 import json
 import pandas as pd
+import redis
 
 class MySQL :
     def __init__(self,key_file,database) :
@@ -39,11 +39,10 @@ class MySQL :
 
 
 class Kafka :
-    def __init__(self,keyfile,topic) :
+    def __init__(self,key_file,topic) :
         KEY = self.load_key(key_file)
-        self.stream = True
         self.consumer = KafkaConsumer(topic, 
-                            bootstrap_servers=[f'{KEY['host']}:{KEY['port']}'],
+                            bootstrap_servers=[f'{KEY["host"]}:{KEY["port"]}'],
                             auto_offset_reset='earliest',
                             enable_auto_commit=True,
                             group_id='my-group',
@@ -55,28 +54,27 @@ class Kafka :
             key = json.load(key_file)
         return key
     
-    def stream_data(self) :
-        if self.stream :
-            for message in self.consumer :
-                data = message.value['Message']
-                datetime = message.value['Asctime']
-                if "activity" in data :
-                    table_name = data['activity']
-                    sql_dict = {
-                            "user_id" : data['user_id'],
-                            "datetime" : datetime.split(',')[0]
-                        }
-                    if table_name == 'resume_sector' :
-                        sql_dict['sector_id'] = data['resume_select']
-                    elif table_name == 'resume_skill' :
-                        sql_dict['skill_id'] = data['resume_select']
-                    elif table_name == 'filtering' :
-                        sql_dict['filtering'] = data['filter_text']
-                    else :
-                        sql_dict['recruit_id'] = data['recruit_id']
+class Redis :
+    def __init__(self) :
+        self.session = redis.StrictRedis(host='redis', port=6379, db=0)
+        print('Redis Connecting')
 
-                    mysql.insert_data(table_name,sql_dict,dtype_map)
-                    print(f"[SQL INPUT]Time : {datetime}, Key: {message.key}, Value: {data}")
+    def insert(self,user_id,data) :
+        print('here')
+        json_data = json.dumps(data,ensure_ascii=False).encode('utf-8')
+        self.session.set(user_id,json_data)
+        print(f'Create Session {user_id} recommand {data}')
     
-    def close_stream(self) :
-        self.stream = False
+    def delete(self,user_id) :
+        print('here')
+        self.session.delete(user_id)
+        print(f'Delete Session {user_id}')
+
+    def get(self,user_id) :
+        return dict(json.loads(self.session.get(user_id).decode('utf-8')))
+        
+    def get_all(self) :
+        placeholder = dict()
+        keys = self.session.keys()
+        values = self.session.mget(keys)
+        return dict(zip(keys,values))
