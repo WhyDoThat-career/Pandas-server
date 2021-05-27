@@ -14,4 +14,8 @@ class MainServer(MySQL) :
     def get_jobplanet_data(self) :
         return self.get_dataframe('company_info')
 
+    @property
+    def get_user_data(self) :
+        return self.get_dataframe('user')
+
     

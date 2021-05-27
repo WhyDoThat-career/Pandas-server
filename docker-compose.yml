@@ -36,3 +36,5 @@ services:
     environment: 
       TZ: "Aisa/Seoul"
     command: python3 -u /opt/kafka-consumer/run.py
+    depends_on: 
+      - pandas-server

@@ -8,23 +8,26 @@ class DataCenter(MySQL) :
         super().__init__(key_file='keys/aws_dc_sql_key.json',database='career-center')
 
     @property
-    def get_click_count(self) :
-        click_count = (self.get_dataframe('click')
-                        .group_by(['recruit_id'])
-                        .count()
-                        .user_id
-                        .sort_values(ascending=False)
-                        )
-        return click_count
+    def get_click(self) :
+        return self.get_dataframe('click')
 
     @property
-    def get_popularity(self) :
-        '''
-        To Do
-        북마크, 조회수 많은 순서로 데이터 프레임을 추출 (북마크가 더 높은 평가지수를 가짐)
-        '''
-        click_group = (self.data_center
-                        .get_dataframe('click')
-                        .group_by(['recruit_id'])
-                        )
+    def get_bookmark(self) :
+        return self.get_dataframe('bookmark')
+    
+    @property
+    def get_recruit_apply(self) :
+        return self.get_dataframe('recruit_apply')
+
+    @property
+    def get_jobsector(self) :
+        return self.get_dataframe('jobsector')
+    
+    @property
+    def get_jobskill(self) :
+        return self.get_dataframe('jobskill')
+
+    @property
+    def get_recruit_stack(self) :
+        return self.get_dataframe('recruit_stack')
 
