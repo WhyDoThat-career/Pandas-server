@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from Data_server.kafka_server import KafkaThread
 from connector import Kafka, Redis
 from Reco_engine.recommend import Recommend
+from fastapi.responses import JSONResponse
 import logging
 import time
 import random
@@ -39,4 +40,4 @@ async def read_reco(user_id : str):
         'recommend' : user_session.get(user_id)
     }
     print('Send recommend',recommend_dict)
-    return recommend_dict
+    return JSONResponse(recommend_dict)

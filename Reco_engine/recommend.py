@@ -37,7 +37,7 @@ class Recommend :
         bookmark = self.dc_db.get_bookmark
         apply = self.dc_db.get_recruit_apply
 
-        total_count = pd.conat([self.click,pd.concat([bookmark,apply])])
+        total_count = pd.concat([self.click,pd.concat([bookmark,apply])])
 
         top10 = (total_count
                     .groupby(['recruit_id'])
@@ -78,7 +78,7 @@ class Recommend :
             if rid in recruit_skill :
                 recruit_skill[rid][int(skill)-1] = 1
             else :
-                recruit_skill[rid] = [0 for i in range(326)]
+                recruit_skill[rid] = [0 for i in range(328)]
         
         df = pd.DataFrame(recruit_skill)
         cos_df = pd.DataFrame(cosine_similarity(df.T), columns = df.columns)
@@ -94,4 +94,8 @@ class Recommend :
                                  right_on='name')[['id_x','id_y']]
                         .rename(columns={'id_x':'recruit_id','id_y':'skill_id'}))
 
-        return pd.concat([skill_tag,sector_tag])[['recruit_id','skill_id']]
+        bigcompany = self.job_detail[['id','big_company']]
+        bigcompany['big_company'] = bigcompany['big_company']+327
+        big_tag = bigcompany.rename(columns={'id' : 'recruit_id','big_company':'skill_id'})
+
+        return pd.concat([skill_tag,pd.concat([sector_tag,big_tag])])[['recruit_id','skill_id']]
