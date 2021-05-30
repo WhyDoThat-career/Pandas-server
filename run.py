@@ -20,7 +20,7 @@ user_session = Redis()
 async def consumer(request: Request) :
     global kafka, user_session, reco_engine
     kafka = await request.json()
-    if kafka['activity']['info'] == 'Logout' :
+    if 'info' in kafka['activity'] and kafka['activity']['info'] == 'Logout' :
             user_id = kafka['user']
             try :
                 user_session.delete(user_id)

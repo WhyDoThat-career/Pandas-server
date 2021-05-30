@@ -12,7 +12,7 @@ class Kafka :
                             bootstrap_servers=[f'{KEY["host"]}:{KEY["port"]}'],
                             auto_offset_reset='earliest',
                             enable_auto_commit=True,
-                            group_id='my-group',
+                            group_id='recommend_server',
                             value_deserializer=lambda x: json.loads(x.decode('utf-8')),
                             )
         self._stop = False
@@ -50,7 +50,7 @@ class Kafka :
                     res = requests.post('http://pandas-server:8080/kafka',data=json.dumps(ret_data),
                      headers=self.headers)
                     print(res)
-                time.sleep(0.1)
+                # time.sleep(0.1)
             
     def close(self) :
         print('Close Stream')

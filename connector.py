@@ -14,7 +14,8 @@ class MySQL :
             passwd=KEY['password'],
             db=database,
             charset='utf8mb4',
-            cursorclass=DictCursor
+            cursorclass=DictCursor,
+            autocommit=True
         )
     def load_key(self,key_file) :
         with open(key_file) as key_file :
@@ -60,13 +61,11 @@ class Redis :
         print('Redis Connecting')
 
     def insert(self,user_id,data) :
-        print('here')
         json_data = json.dumps(data,ensure_ascii=False).encode('utf-8')
         self.session.set(user_id,json_data)
         print(f'Create Session {user_id} recommand {data}')
     
     def delete(self,user_id) :
-        print('here')
         self.session.delete(user_id)
         print(f'Delete Session {user_id}')
 
