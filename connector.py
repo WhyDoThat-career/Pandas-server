@@ -32,7 +32,9 @@ class MySQL :
         cusor = db.cursor()
         sql_query = f'SELECT * FROM {table}'
         cusor.execute(sql_query)
-        return pd.DataFrame(cusor.fetchall())
+        data = cusor.fetchall()
+        db.close()
+        return pd.DataFrame(data)
     
     def update_data(self,table,items) :
         db = self.conn_mysqldb()
@@ -70,7 +72,10 @@ class Redis :
         print(f'Delete Session {user_id}')
 
     def get(self,user_id) :
-        return json.loads(self.session.get(user_id).decode('utf-8'))
+        try :
+            return json.loads(self.session.get(user_id).decode('utf-8'))
+        except :
+            print(f'No User in Session {user_id}')
         
     def get_all(self) :
         placeholder = dict()
